@@ -1,9 +1,15 @@
+export interface LinkItem {
+  label: string;
+  url: string;
+}
+
 export interface ContactInfo {
   name: string;
   title?: string;
   phone?: string;
   email?: string;
   links?: string[];
+  link_items?: LinkItem[];
 }
 
 export interface ExperienceItem {
@@ -19,6 +25,7 @@ export interface ProjectItem {
   name: string;
   tech_stack?: string;
   link?: string;
+  link_url?: string;
   bullets: string[];
 }
 

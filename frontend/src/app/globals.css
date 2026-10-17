@@ -25,24 +25,35 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Print Styles for A4 Resume Export */
+/* Strict Print Isolation: Guarantees ONLY the resume sheet is printed */
 @media print {
   @page {
-    size: A4;
-    margin: 12mm 15mm;
+    size: A4 portrait;
+    margin: 8mm 12mm;
   }
 
-  body {
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
     background: #ffffff !important;
-    color: #000000 !important;
+    color: #111827 !important;
   }
 
-  header, nav, form, .no-print {
-    display: none !important;
+  /* Completely hide all elements by default */
+  body * {
+    visibility: hidden !important;
   }
 
-  .resume-sheet {
-    display: block !important;
+  /* Only display the resume sheet, anchored to top-left of page */
+  #resume-sheet-content,
+  #resume-sheet-content * {
+    visibility: visible !important;
+  }
+
+  #resume-sheet-content {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
@@ -51,5 +62,10 @@ body {
     border: none !important;
     background: #ffffff !important;
     color: #111827 !important;
+  }
+
+  /* Explicitly hide non-printable UI elements */
+  header, nav, form, button, .no-print {
+    display: none !important;
   }
 }

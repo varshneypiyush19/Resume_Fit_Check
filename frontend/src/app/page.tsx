@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import ResumeUploader from "@/components/ResumeUploader";
 import JobDescriptionInput from "@/components/JobDescriptionInput";
 import OutputDisplay from "@/components/OutputDisplay";
-import { tailorResume } from "@/lib/api";
+import { tailorResume, tailorResumeStream } from "@/lib/api";
 import { TailoredResumeResponse } from "@/types/resume";
 import {
   Sparkles,
@@ -14,6 +14,7 @@ import {
   FileSearch,
   RefreshCw,
   ArrowRight,
+  Terminal,
 } from "lucide-react";
 
 export default function Home() {
@@ -21,6 +22,8 @@ export default function Home() {
   const [jobDescription, setJobDescription] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingStage, setLoadingStage] = useState<string>("");
+  const [liveStreamPreview, setLiveStreamPreview] = useState<string>("");
+  const [streamedTokenCount, setStreamedTokenCount] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<TailoredResumeResponse | null>(null);
 
@@ -40,28 +43,31 @@ export default function Home() {
     }
 
     setIsLoading(true);
-    setLoadingStage("Parsing resume document...");
-
-    // Simulated progress steps for great UX
-    const stage1 = setTimeout(() => {
-      setLoadingStage("Analyzing Job Description keywords...");
-    }, 1500);
-
-    const stage2 = setTimeout(() => {
-      setLoadingStage("AI Tailoring summary, skills, and experience bullets...");
-    }, 3200);
+    setLoadingStage("Parsing resume document & hyperlinks...");
+    setLiveStreamPreview("");
+    setStreamedTokenCount(0);
 
     try {
-      const responseData = await tailorResume(file, jobDescription);
+      const responseData = await tailorResumeStream(
+        file,
+        jobDescription,
+        (stage) => {
+          setLoadingStage(stage);
+        },
+        (chunk) => {
+          setStreamedTokenCount((prev) => prev + 1);
+          setLiveStreamPreview((prev) => (prev + chunk).slice(-260));
+        }
+      );
       setResult(responseData);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
       setError(msg);
     } finally {
-      clearTimeout(stage1);
-      clearTimeout(stage2);
       setIsLoading(false);
       setLoadingStage("");
+      setLiveStreamPreview("");
+      setStreamedTokenCount(0);
     }
   };
 
@@ -78,7 +84,7 @@ export default function Home() {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Intro Banner */}
-        <div className="mb-8 text-center sm:text-left">
+        <div className="no-print mb-8 text-center sm:text-left">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
             Tailor Candidate Resumes to Any Job
           </h2>
@@ -89,7 +95,7 @@ export default function Home() {
 
         {/* Global Error Alert */}
         {error && (
-          <div className="mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 flex items-start gap-3">
+          <div className="no-print mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
             <div className="flex-1">
               <h4 className="text-sm font-semibold text-red-800 dark:text-red-300">
@@ -105,7 +111,7 @@ export default function Home() {
         {/* Main 2-Column Responsive Workspace */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* LEFT COLUMN: Inputs (5 cols on desktop) */}
-          <div className="lg:col-span-5 space-y-6">
+          <div className="no-print lg:col-span-5 space-y-6">
             <form onSubmit={handleSubmit} className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-sm space-y-6">
               <ResumeUploader
                 file={file}
@@ -165,8 +171,8 @@ export default function Home() {
           {/* RIGHT COLUMN: Results / Preview (7 cols on desktop) */}
           <div className="lg:col-span-7">
             {isLoading ? (
-              /* Loading State Card */
-              <div className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-sm text-center py-20 space-y-4">
+              /* Loading State Card with Real-time SSE Token Streaming */
+              <div className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-sm text-center py-12 space-y-4">
                 <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 mx-auto flex items-center justify-center animate-pulse">
                   <Sparkles className="w-8 h-8" />
                 </div>
@@ -181,6 +187,23 @@ export default function Home() {
                 <div className="max-w-xs mx-auto w-full bg-gray-100 dark:bg-gray-800 h-1.5 rounded-full overflow-hidden">
                   <div className="bg-blue-600 h-full w-2/3 animate-[pulse_1.5s_infinite]"></div>
                 </div>
+
+                {/* Real-time SSE Token Stream Visualizer */}
+                {liveStreamPreview && (
+                  <div className="mt-5 p-4 rounded-2xl bg-gray-950 text-left font-mono text-[11px] border border-gray-800 shadow-inner max-w-lg mx-auto overflow-hidden transition-all">
+                    <div className="flex items-center justify-between border-b border-gray-800/80 pb-2 mb-2 text-[10px] text-gray-400">
+                      <span className="flex items-center gap-1.5 font-semibold text-emerald-400">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                        Live SSE Token Stream
+                      </span>
+                      <span className="text-gray-500">{streamedTokenCount} chunks received</span>
+                    </div>
+                    <div className="line-clamp-4 break-all text-gray-300 leading-relaxed">
+                      {liveStreamPreview}
+                      <span className="inline-block w-1.5 h-3.5 bg-emerald-400 animate-pulse ml-0.5 align-middle" />
+                    </div>
+                  </div>
+                )}
               </div>
             ) : result ? (
               /* Output Display with Scores & Tabs */

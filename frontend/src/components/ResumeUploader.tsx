@@ -15,6 +15,7 @@ export default function ResumeUploader({
   error,
 }: ResumeUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const formatFileSize = (bytes: number) => {
@@ -31,15 +32,16 @@ export default function ResumeUploader({
     const extension = selectedFile.name.toLowerCase();
 
     if (!extension.endsWith(".pdf") && !extension.endsWith(".docx")) {
-      alert("Unsupported format. Please upload a PDF or DOCX file.");
+      setLocalError("Unsupported format. Only PDF (.pdf) and Word (.docx) documents are supported.");
       return;
     }
 
     if (selectedFile.size > 5 * 1024 * 1024) {
-      alert("File size exceeds 5MB limit. Please upload a smaller file.");
+      setLocalError("File size exceeds 5MB limit. Please upload a smaller document.");
       return;
     }
 
+    setLocalError(null);
     onFileSelect(selectedFile);
   };
 
@@ -118,7 +120,10 @@ export default function ResumeUploader({
 
           <button
             type="button"
-            onClick={() => onFileSelect(null)}
+            onClick={() => {
+              setLocalError(null);
+              onFileSelect(null);
+            }}
             className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
             title="Remove file"
           >
@@ -127,11 +132,13 @@ export default function ResumeUploader({
         </div>
       )}
 
-      {error && (
-        <p className="mt-2 text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
-          <AlertCircle className="w-3.5 h-3.5" />
-          {error}
-        </p>
+      {(error || localError) && (
+        <div className="mt-2.5 p-2.5 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
+          <span className="text-xs text-red-700 dark:text-red-300 font-medium">
+            {error || localError}
+          </span>
+        </div>
       )}
     </div>
   );
