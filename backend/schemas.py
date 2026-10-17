@@ -2,6 +2,11 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
+class LinkItem(BaseModel):
+    label: str = Field(description="Display label, e.g. 'LinkedIn', 'GitHub', 'Portfolio', 'LeetCode'")
+    url: str = Field(description="Full destination URL, e.g. 'https://linkedin.com/in/piyushvarshney19'")
+
+
 class ContactInfo(BaseModel):
     name: str = Field(description="Candidate's full name, e.g. PIYUSH VARSHNEY")
     title: Optional[str] = Field(default="", description="Professional title/tagline from resume")
@@ -9,7 +14,11 @@ class ContactInfo(BaseModel):
     email: Optional[str] = Field(default="", description="Email address")
     links: List[str] = Field(
         default_factory=list,
-        description="Links such as LinkedIn, GitHub, Portfolio, LeetCode"
+        description="Link labels such as LinkedIn, GitHub, Portfolio, LeetCode"
+    )
+    link_items: List[LinkItem] = Field(
+        default_factory=list,
+        description="Detailed list of contact links with both display label and full destination URL"
     )
 
 
@@ -30,7 +39,8 @@ class ExperienceItem(BaseModel):
 class ProjectItem(BaseModel):
     name: str = Field(description="Project name")
     tech_stack: Optional[str] = Field(default="", description="Technologies used, e.g. MERN, Socket.IO")
-    link: Optional[str] = Field(default="", description="Project links, e.g. Live Demo, GitHub")
+    link: Optional[str] = Field(default="", description="Project links label, e.g. 'View Live'")
+    link_url: Optional[str] = Field(default="", description="Actual destination URL, e.g. 'https://frienz.vercel.app'")
     bullets: List[str] = Field(description="Impactful bullet points describing the project")
 
 

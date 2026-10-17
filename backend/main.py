@@ -1,10 +1,11 @@
 import os
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 from parser import parse_resume
-from llm_service import tailor_resume_with_llm
+from llm_service import tailor_resume_with_llm, tailor_resume_stream_with_llm
 from schemas import TailoredResumeResponse
 
 # Load environment variables
@@ -111,3 +112,58 @@ async def tailor_resume_endpoint(
             status_code=500,
             detail=f"Failed to customize resume with AI: {str(llm_err)}",
         )
+
+
+@app.post("/api/tailor-stream")
+async def tailor_resume_stream_endpoint(
+    file: UploadFile = File(..., description="Uploaded resume file (PDF or DOCX)"),
+    job_description: str = Form(..., description="Target Job Description text"),
+):
+    """
+    Real-time streaming endpoint yielding Server-Sent Events (SSE) as Gemini generates tokens.
+    """
+    jd_clean = job_description.strip()
+    if not jd_clean or len(jd_clean) < 30:
+        raise HTTPException(
+            status_code=400,
+            detail="Job description is too short. Please provide a complete job description (at least 30 characters).",
+        )
+
+    filename = file.filename or ""
+    filename_lower = filename.lower()
+    if not (filename_lower.endswith(".pdf") or filename_lower.endswith(".docx")):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file format for '{filename}'. Only PDF (.pdf) and Word (.docx) files are supported.",
+        )
+
+    try:
+        file_bytes = await file.read()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to read uploaded file: {str(e)}")
+
+    if len(file_bytes) == 0:
+        raise HTTPException(status_code=400, detail="The uploaded file is empty (0 bytes).")
+
+    if len(file_bytes) > MAX_FILE_SIZE_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File exceeds maximum allowed size of 5MB (Uploaded: {len(file_bytes) / (1024 * 1024):.1f}MB).",
+        )
+
+    try:
+        resume_text = parse_resume(file_bytes, filename)
+    except ValueError as val_err:
+        raise HTTPException(status_code=400, detail=str(val_err))
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=f"Error parsing document: {str(err)}")
+
+    return StreamingResponse(
+        tailor_resume_stream_with_llm(resume_text, jd_clean),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )

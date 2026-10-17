@@ -4,26 +4,45 @@ import docx
 
 
 def extract_text_from_pdf(file_bytes: bytes) -> str:
-    """Extracts text from PDF binary bytes using pdfplumber."""
+    """Extracts text and hyperlink annotations from PDF binary bytes using pdfplumber."""
     extracted_text = []
+    hyperlinks = []
     with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
-        for page_num, page in enumerate(pdf.pages, start=1):
+        for page in pdf.pages:
             text = page.extract_text()
             if text:
                 extracted_text.append(text.strip())
+            for h in page.hyperlinks:
+                uri = h.get("uri")
+                if uri and uri not in hyperlinks and not uri.startswith("mailto:"):
+                    hyperlinks.append(uri)
     
-    return "\n\n".join(extracted_text)
+    full_text = "\n\n".join(extracted_text)
+    if hyperlinks:
+        full_text += "\n\n--- EXTRACTED HYPERLINKS FROM RESUME ---\n"
+        for uri in hyperlinks:
+            full_text += f"- {uri}\n"
+
+    return full_text
 
 
 def extract_text_from_docx(file_bytes: bytes) -> str:
-    """Extracts text from DOCX binary bytes using python-docx."""
+    """Extracts text and hyperlink relationships from DOCX binary bytes using python-docx."""
     doc = docx.Document(io.BytesIO(file_bytes))
     extracted_text = []
+    hyperlinks = []
     
     # Extract text from paragraphs
     for para in doc.paragraphs:
         if para.text.strip():
             extracted_text.append(para.text.strip())
+
+    # Extract hyperlinks from relationships
+    for rel in doc.part.rels.values():
+        if "hyperlink" in rel.reltype:
+            target = rel.target_ref
+            if target and target not in hyperlinks and not target.startswith("mailto:"):
+                hyperlinks.append(target)
             
     # Also extract text from any tables in the resume
     for table in doc.tables:
@@ -32,7 +51,13 @@ def extract_text_from_docx(file_bytes: bytes) -> str:
             if row_text:
                 extracted_text.append(" | ".join(row_text))
                 
-    return "\n".join(extracted_text)
+    full_text = "\n".join(extracted_text)
+    if hyperlinks:
+        full_text += "\n\n--- EXTRACTED HYPERLINKS FROM RESUME ---\n"
+        for uri in hyperlinks:
+            full_text += f"- {uri}\n"
+
+    return full_text
 
 
 def parse_resume(file_bytes: bytes, filename: str) -> str:
