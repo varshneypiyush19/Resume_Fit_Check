@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Resume Tailor AI | Full-Stack LLM Resume Customizer",
-  description: "Intelligently customize and align candidate resumes to any Job Description using LLMs.",
+  title: "ResumeFit | AI-Powered ATS Resume Tailor & Optimizer",
+  description: "Intelligently customize and align candidate resumes to any Job Description using Google Gemini AI.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

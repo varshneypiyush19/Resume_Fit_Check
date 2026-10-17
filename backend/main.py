@@ -1,5 +1,7 @@
 import os
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+import time
+from collections import defaultdict
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -17,17 +19,26 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Configure CORS so our Next.js frontend can call this backend
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
-allowed_origins = [
-    FRONTEND_URL,
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+# Configure CORS strictly from environment variables
+frontend_env = os.getenv("FRONTEND_URL")
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS")
+
+origins = []
+if frontend_env:
+    for url in frontend_env.split(","):
+        if url.strip():
+            origins.append(url.strip().rstrip("/"))
+if allowed_origins_env:
+    for url in allowed_origins_env.split(","):
+        if url.strip():
+            origins.append(url.strip().rstrip("/"))
+
+# Strict CORS: Only origins explicitly registered in FRONTEND_URL or ALLOWED_ORIGINS can call the API
+cors_origins = origins if origins else ["*"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins for local dev & cloud deployment
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -36,6 +47,25 @@ app.add_middleware(
 # Max allowed file size: 5 MB
 MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
 
+# Quota & Billing Protection: Max 6 AI tailoring requests per minute per IP address
+RATE_LIMIT_WINDOW_SECONDS = 60
+RATE_LIMIT_MAX_REQUESTS = 3
+_ip_request_timestamps = defaultdict(list)
+
+def enforce_rate_limit(request: Request):
+    client_ip = request.client.host if request.client else "unknown"
+    now = time.time()
+    # Retain only timestamps inside active window
+    _ip_request_timestamps[client_ip] = [
+        t for t in _ip_request_timestamps[client_ip] if now - t < RATE_LIMIT_WINDOW_SECONDS
+    ]
+    if len(_ip_request_timestamps[client_ip]) >= RATE_LIMIT_MAX_REQUESTS:
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded (maximum 3 optimizations per minute). Please wait a moment before trying again to protect Gemini API quota.",
+        )
+    _ip_request_timestamps[client_ip].append(now)
+
 
 @app.get("/")
 def root():
@@ -43,6 +73,7 @@ def root():
         "message": "Resume Customizer API is online.",
         "docs_url": "/docs",
         "health_url": "/health",
+        "authorized_origins": cors_origins,
     }
 
 
@@ -52,14 +83,17 @@ def health_check():
         "status": "healthy",
         "service": "resume-customizer-api",
         "version": "1.0.0",
+        "authorized_origins": cors_origins,
     }
 
 
 @app.post("/api/tailor", response_model=TailoredResumeResponse)
 async def tailor_resume_endpoint(
+    request: Request,
     file: UploadFile = File(..., description="Uploaded resume file (PDF or DOCX)"),
     job_description: str = Form(..., description="Target Job Description text"),
 ):
+    enforce_rate_limit(request)
     # 1. Validate Job Description input
     jd_clean = job_description.strip()
     if not jd_clean or len(jd_clean) < 30:
@@ -116,12 +150,14 @@ async def tailor_resume_endpoint(
 
 @app.post("/api/tailor-stream")
 async def tailor_resume_stream_endpoint(
+    request: Request,
     file: UploadFile = File(..., description="Uploaded resume file (PDF or DOCX)"),
     job_description: str = Form(..., description="Target Job Description text"),
 ):
     """
     Real-time streaming endpoint yielding Server-Sent Events (SSE) as Gemini generates tokens.
     """
+    enforce_rate_limit(request)
     jd_clean = job_description.strip()
     if not jd_clean or len(jd_clean) < 30:
         raise HTTPException(
