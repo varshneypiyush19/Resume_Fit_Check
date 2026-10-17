@@ -1,6 +1,17 @@
 import { TailoredResumeResponse } from "@/types/resume";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+export const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_API_URL || ""
+).replace(/\/+$/, "");
+
+export async function checkBackendHealth(): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/health`, { cache: "no-store" });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
 
 export async function tailorResume(
   file: File,

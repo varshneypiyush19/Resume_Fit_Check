@@ -62,7 +62,7 @@ export default function ResumeUploader({
 
   return (
     <div className="w-full">
-      <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
+      <label className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-2">
         1. Upload Candidate Resume <span className="text-red-500">*</span>
       </label>
 
@@ -74,8 +74,8 @@ export default function ResumeUploader({
           onClick={() => fileInputRef.current?.click()}
           className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 ${
             isDragging
-              ? "border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 scale-[0.99]"
-              : "border-gray-300 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-600 bg-gray-50/50 dark:bg-gray-800/40"
+              ? "border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/20 scale-[0.99]"
+              : "border-slate-300 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 bg-slate-50/60 dark:bg-slate-900/40"
           }`}
         >
           <input
@@ -86,32 +86,32 @@ export default function ResumeUploader({
             onChange={(e) => handleFiles(e.target.files)}
           />
 
-          <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 mx-auto flex items-center justify-center mb-3">
+          <div className="w-12 h-12 rounded-xl bg-indigo-100/80 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 mx-auto flex items-center justify-center mb-3">
             <UploadCloud className="w-6 h-6" />
           </div>
 
-          <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
             Click to upload or drag & drop
           </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Supports PDF or DOCX (Max 5MB)
           </p>
         </div>
       ) : (
-        <div className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl p-4 flex items-center justify-between shadow-sm">
+        <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl p-4 flex items-center justify-between shadow-2xs">
           <div className="flex items-center space-x-3 overflow-hidden">
-            <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
               <FileText className="w-5 h-5" />
             </div>
             <div className="truncate">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
                 {file.name}
               </p>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-slate-500 dark:text-slate-400">
                   {formatFileSize(file.size)}
                 </span>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                   {file.name.split(".").pop()}
                 </span>
               </div>
@@ -124,7 +124,7 @@ export default function ResumeUploader({
               setLocalError(null);
               onFileSelect(null);
             }}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
             title="Remove file"
           >
             <X className="w-4 h-4" />

@@ -28,13 +28,13 @@ export default function JobDescriptionInput({
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-2">
-        <label className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+        <label className="text-sm font-semibold text-slate-900 dark:text-slate-100">
           2. Target Job Description <span className="text-red-500">*</span>
         </label>
         <button
           type="button"
           onClick={() => onChange(SAMPLE_JD)}
-          className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 font-medium"
+          className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline flex items-center gap-1 font-semibold cursor-pointer"
         >
           <Sparkles className="w-3 h-3" />
           Load Sample JD
@@ -47,14 +47,14 @@ export default function JobDescriptionInput({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Paste the complete job description here (e.g., responsibilities, qualifications, tech stack requirements)..."
-          className="w-full rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900/60 p-4 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all resize-y"
+          className="w-full rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/70 p-4 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none transition-all resize-y"
         />
 
         {value && (
           <button
             type="button"
             onClick={() => onChange("")}
-            className="absolute top-3 right-3 p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="absolute top-3 right-3 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             title="Clear text"
           >
             <Trash2 className="w-4 h-4" />
@@ -69,14 +69,14 @@ export default function JobDescriptionInput({
             {error}
           </p>
         ) : (
-          <span className="text-xs text-gray-400">Minimum 30 characters</span>
+          <span className="text-xs text-slate-400">Minimum 30 characters</span>
         )}
 
         <span
           className={`text-xs ${
             charCount > 0 && charCount < 30
               ? "text-amber-500 font-medium"
-              : "text-gray-400"
+              : "text-slate-400"
           }`}
         >
           {charCount} characters

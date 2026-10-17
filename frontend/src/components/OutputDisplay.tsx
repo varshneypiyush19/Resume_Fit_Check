@@ -36,34 +36,36 @@ export default function OutputDisplay({ data }: OutputDisplayProps) {
       </div>
 
       {/* 2. Mode Selector Bar (Full Document vs Analytics) */}
-      <div className="no-print flex items-center justify-between p-1.5 rounded-2xl bg-gray-200/60 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60">
+      <div className="no-print flex items-center justify-between p-1.5 rounded-2xl bg-slate-200/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-750 shadow-2xs">
         <button
           type="button"
           onClick={() => setViewMode("document")}
-          className={`flex-1 py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+          className={`flex-1 py-2.5 px-3 sm:px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
             viewMode === "document"
-              ? "bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-sm"
-              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              ? "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
           }`}
         >
-          <FileText className="w-4 h-4" />
-          <span>Full Tailored Resume (Document View)</span>
-          <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-            A4 Ready
+          <FileText className="w-4 h-4 shrink-0" />
+          <span className="hidden sm:inline">Full Tailored Resume</span>
+          <span className="sm:hidden">Resume Sheet</span>
+          <span className="text-[9px] sm:text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">
+            A4
           </span>
         </button>
 
         <button
           type="button"
           onClick={() => setViewMode("analytics")}
-          className={`flex-1 py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+          className={`flex-1 py-2.5 px-3 sm:px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
             viewMode === "analytics"
-              ? "bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-sm"
-              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              ? "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
           }`}
         >
-          <BarChart3 className="w-4 h-4" />
-          <span>ATS Keyword & Diff Analytics</span>
+          <BarChart3 className="w-4 h-4 shrink-0" />
+          <span className="hidden sm:inline">ATS Keyword & Diff Analytics</span>
+          <span className="sm:hidden">Analytics & Diff</span>
         </button>
       </div>
 
@@ -71,16 +73,16 @@ export default function OutputDisplay({ data }: OutputDisplayProps) {
       {viewMode === "document" ? (
         <ResumeDocumentPreview documentData={data.tailored_document} />
       ) : (
-        <div className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden">
+        <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-sm overflow-hidden">
           {/* Sub-tabs */}
-          <div className="border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center space-x-2 bg-gray-50/50 dark:bg-gray-800/40">
+          <div className="border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center space-x-2 bg-slate-50/50 dark:bg-slate-800/40">
             <button
               type="button"
               onClick={() => setActiveTab("summary")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === "summary"
-                  ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-300 shadow-sm"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               Summary
@@ -89,14 +91,14 @@ export default function OutputDisplay({ data }: OutputDisplayProps) {
             <button
               type="button"
               onClick={() => setActiveTab("skills")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTab === "skills"
-                  ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-300 shadow-sm"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               Skills
-              <span className="w-4 h-4 rounded-full bg-blue-100 dark:bg-blue-900 text-[10px] flex items-center justify-center font-bold text-blue-700 dark:text-blue-300">
+              <span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-950 text-[10px] flex items-center justify-center font-bold text-indigo-700 dark:text-indigo-300">
                 {data.matched_skills.length}
               </span>
             </button>
@@ -104,14 +106,14 @@ export default function OutputDisplay({ data }: OutputDisplayProps) {
             <button
               type="button"
               onClick={() => setActiveTab("experience")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTab === "experience"
-                  ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-300 shadow-sm"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               Experience
-              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.2 rounded">
+              <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-950/60 px-1.5 py-0.2 rounded">
                 Diff View
               </span>
             </button>
@@ -119,10 +121,10 @@ export default function OutputDisplay({ data }: OutputDisplayProps) {
             <button
               type="button"
               onClick={() => setActiveTab("tips")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === "tips"
-                  ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-300 shadow-sm"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               Recommendations
@@ -133,11 +135,11 @@ export default function OutputDisplay({ data }: OutputDisplayProps) {
             {/* SUMMARY TAB */}
             {activeTab === "summary" && (
               <div className="space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
                   Tailored Professional Summary
                 </h4>
-                <div className="p-4 rounded-xl bg-blue-50/40 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 text-xs sm:text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
                   {data.tailored_document.summary}
                 </div>
               </div>
@@ -191,14 +193,14 @@ export default function OutputDisplay({ data }: OutputDisplayProps) {
                 {data.tailored_document.experience.map((exp, idx) => (
                   <div
                     key={idx}
-                    className="border border-gray-200 dark:border-gray-800 rounded-xl p-4 bg-gray-50/30 dark:bg-gray-800/20 space-y-3"
+                    className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/40 dark:bg-slate-800/30 space-y-3"
                   >
                     <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <Briefcase className="w-4 h-4 text-blue-600" />
-                        {exp.role} {exp.company && <span className="text-gray-500 font-normal">at {exp.company}</span>}
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <Briefcase className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        {exp.role} {exp.company && <span className="text-slate-500 font-normal">at {exp.company}</span>}
                       </h4>
-                      <span className="text-xs text-gray-500">{exp.dates}</span>
+                      <span className="text-xs text-slate-500">{exp.dates}</span>
                     </div>
 
                     <div>
@@ -209,7 +211,7 @@ export default function OutputDisplay({ data }: OutputDisplayProps) {
                         {exp.tailored_bullets.map((b, bIdx) => (
                           <li
                             key={bIdx}
-                            className="text-xs text-gray-800 dark:text-gray-200 flex items-start gap-2 bg-emerald-50/50 dark:bg-emerald-950/20 p-2 rounded-lg border border-emerald-100 dark:border-emerald-900/30"
+                            className="text-xs text-slate-800 dark:text-slate-200 flex items-start gap-2 bg-emerald-50/50 dark:bg-emerald-950/20 p-2.5 rounded-lg border border-emerald-100 dark:border-emerald-900/30"
                           >
                             <span className="text-emerald-600 font-bold shrink-0">✓</span>
                             <span>{b}</span>
@@ -219,11 +221,11 @@ export default function OutputDisplay({ data }: OutputDisplayProps) {
                     </div>
 
                     {exp.original_bullets && exp.original_bullets.length > 0 && (
-                      <details className="mt-2 text-xs text-gray-500">
-                        <summary className="cursor-pointer font-medium hover:text-gray-700 dark:hover:text-gray-300">
+                      <details className="mt-2 text-xs text-slate-500">
+                        <summary className="cursor-pointer font-medium hover:text-slate-700 dark:hover:text-slate-300">
                           View Original Bullets ({exp.original_bullets.length})
                         </summary>
-                        <ul className="mt-2 space-y-1 pl-4 list-disc text-gray-400">
+                        <ul className="mt-2 space-y-1 pl-4 list-disc text-slate-400">
                           {exp.original_bullets.map((ob, obIdx) => (
                             <li key={obIdx}>{ob}</li>
                           ))}
@@ -238,7 +240,7 @@ export default function OutputDisplay({ data }: OutputDisplayProps) {
             {/* TIPS TAB */}
             {activeTab === "tips" && (
               <div className="space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
                   <Lightbulb className="w-3.5 h-3.5" />
                   Career Coach Recommendations
                 </h4>
@@ -246,9 +248,9 @@ export default function OutputDisplay({ data }: OutputDisplayProps) {
                   {data.key_recommendations.map((tip, idx) => (
                     <li
                       key={idx}
-                      className="p-3 rounded-xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 text-xs text-gray-800 dark:text-gray-200 flex items-start gap-2"
+                      className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-200 flex items-start gap-2.5"
                     >
-                      <span className="font-bold text-indigo-600">{idx + 1}.</span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400">{idx + 1}.</span>
                       <span>{tip}</span>
                     </li>
                   ))}
